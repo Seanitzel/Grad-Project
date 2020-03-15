@@ -1,0 +1,1 @@
+{"data":{"inputMin":[238.192138671875,226.307373046875],"inputMax":[265.8747253417969,423.72174072265625],"outputMin":0,"outputMax":1},"meta":{"inputUnits":2,"outputUnits":2,"inputs":{"x":{"dtype":"number"},"y":{"dtype":"number"}},"outputs":{"label":{"dtype":"string","uniqueValues":["o","m"],"legend":{"o":[1,0],"m":[0,1]}}},"isNormalized":true}}
