@@ -10,11 +10,11 @@
 </template>
 
 <script>
-  import * as p5             from 'p5'
-  import setup, { setState } from './PlaySetup'
+  import * as p5                     from 'p5'
+  import setup, { remove, setState } from './TrainSetup'
 
   export default {
-    name: 'HelloWorld',
+    name: 'Train',
     data () {
       return {
         toggle: false,
@@ -24,6 +24,10 @@
 
     mounted () {
       new p5(setup, this.$refs.canvas)
+    },
+
+    beforeDestroy () {
+      remove()
     },
 
     methods: {

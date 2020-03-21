@@ -1,6 +1,8 @@
 import { Synth } from 'tone'
 
 let p5
+let removeP5
+
 let video
 let recording     = false
 let targetLabel   = 'o'
@@ -189,7 +191,7 @@ export default function (_p5, parent) {
           prevX = x
           prevY = y
           if (result[0].label === 'o') {
-            synth.setNote('C$')
+            synth.setNote('C4')
           } else {
             synth.setNote('C3')
           }
@@ -203,6 +205,7 @@ export default function (_p5, parent) {
   }
 
   p5.draw = () => {
+    shouldRemove()
     if (allModelsReady) {
       p5.translate(video.width, 0)
       p5.scale(-1, 1)
@@ -216,6 +219,14 @@ export default function (_p5, parent) {
       drawSkeleton()
 
       posenetAction()
+    }
+  }
+
+  const shouldRemove = () => {
+    if (removeP5) {
+      video.remove()
+      p5.remove()
+      removeP5 = false
     }
   }
 
@@ -283,4 +294,9 @@ export function setState (s) {
   } else {
     synth.triggerRelease()
   }
+}
+
+export function remove () {
+  synth.triggerRelease()
+  removeP5 = true
 }
