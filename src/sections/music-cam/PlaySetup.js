@@ -21,10 +21,6 @@ let isOctaveUpdateAvailable = true
 
 let mouthTop    = -Infinity
 let mouthBottom = Infinity
-let prevX       = 0
-let prevY       = 0
-
-const maxDist = 20
 
 const synthConfig = {
   oscillator: {
@@ -184,8 +180,6 @@ export default function (_p5, parent) {
       const leftShoulderY     = poses[0].leftShoulder.y
       const rightHipX         = poses[0].rightHip.x
       const rightHipY         = poses[0].rightHip.y
-      prevX                   = leftHandX
-      prevY                   = leftHandX
       const leftShoulderDist  = parseInt(p5.dist(leftHandX, leftHandY, leftShoulderX, leftShoulderY))
       const rightShoulderDist = parseInt(p5.dist(leftHandX, leftHandY, rightHipX, rightHipY))
       if (leftShoulderDist < 60) {
