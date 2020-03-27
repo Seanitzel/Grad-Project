@@ -13,14 +13,18 @@ let allModelsReady = false
 
 let poses, skeletons
 
-let dbLevel     = -80
-const currNote  = 'C3'
+let dbLevel                 = -80
+let currNote                = 'C4'
+let pitchClasses            = ['C', 'D', 'E', 'G', 'A']
+let octave                  = 4
+let isOctaveUpdateAvailable = true
+
 let mouthTop    = -Infinity
 let mouthBottom = Infinity
 let prevX       = 0
 let prevY       = 0
 
-const maxDist = 70
+const maxDist = 20
 
 const synthConfig = {
   oscillator: {
@@ -116,7 +120,7 @@ export default function (_p5, parent) {
       p5.vertex(x, y)
     }
     const dist = p5.dist(0, mouthBottom, 0, mouthTop)
-    dbLevel    = p5.map(dist, 5, 20, -80, 0)
+    dbLevel    = p5.map(dist, 5, 15, -80, 0)
     if (dbLevel > 0) {
       dbLevel = 0
     }
@@ -146,41 +150,59 @@ export default function (_p5, parent) {
 
   const classify = () => {
     if (poses && poses[0]) {
-      const x      = poses[0].rightWrist.x
-      const y      = poses[0].rightWrist.y
-      const inputs = {
-        x,
-        y,
-      }
-      NNModel.classify(inputs, (error, result) => {
-        if (error) {
-          console.log(error)
-          return
-        }
-        // const dist = parseInt(p5.dist(prevX, prevY, x, y))
-        // if (dist > maxDist) {
-          prevX             = x
-          prevY             = y
-        const resultLabel = result[0].label
-        console.log(resultLabel)
-        if (resultLabel === '0') {
-          synth.setNote('C4')
-        } else if (resultLabel === '1') {
-          synth.setNote('D4')
-        } else if (resultLabel === '2') {
-          synth.setNote('E4')
-        } else if (resultLabel === '3') {
-          synth.setNote('G4')
-        } else if (resultLabel === '4') {
-          synth.setNote('A4')
-        }
-        // }
-      })
+      updatePitchClass()
+      updateOctave()
     }
   }
 
-  p5.mouseClicked = () => {
-    classify()
+  const updatePitchClass = () => {
+    const x      = poses[0].rightWrist.x
+    const y      = poses[0].rightWrist.y
+    const inputs = {
+      x,
+      y,
+    }
+    NNModel.classify(inputs, (error, result) => {
+      if (error) {
+        return
+      }
+      const resultLabel = result[0].label
+      const pc          = pitchClasses[parseInt(resultLabel)]
+      const note        = `${pc}${octave}`
+      if (note !== currNote) {
+        currNote = note
+        synth.setNote(note)
+      }
+    })
+  }
+
+  const updateOctave = () => {
+    if (isOctaveUpdateAvailable) {
+      const leftHandX         = poses[0].leftWrist.x
+      const leftHandY         = poses[0].leftWrist.y
+      const leftShoulderX     = poses[0].leftShoulder.x
+      const leftShoulderY     = poses[0].leftShoulder.y
+      const rightHipX         = poses[0].rightHip.x
+      const rightHipY         = poses[0].rightHip.y
+      prevX                   = leftHandX
+      prevY                   = leftHandX
+      const leftShoulderDist  = parseInt(p5.dist(leftHandX, leftHandY, leftShoulderX, leftShoulderY))
+      const rightShoulderDist = parseInt(p5.dist(leftHandX, leftHandY, rightHipX, rightHipY))
+      if (leftShoulderDist < 60) {
+        --octave
+        onOctaveUpdate()
+      } else if (rightShoulderDist < 60) {
+        ++octave
+        onOctaveUpdate()
+      }
+    }
+  }
+
+  const onOctaveUpdate = () => {
+    isOctaveUpdateAvailable = false
+    setTimeout(() => {
+      isOctaveUpdateAvailable = true
+    }, 400)
   }
 
   p5.draw = () => {
@@ -190,12 +212,9 @@ export default function (_p5, parent) {
       p5.scale(-1, 1)
       p5.image(video, 0, 0, video.width, video.height)
 
-      p5.fill(100, 255, 100)
-      p5.ellipse(prevX, prevY, 20, 20)
-
       faceapiAction()
 
-      // drawSkeleton()
+      drawSkeleton()
 
       posenetAction()
     }
@@ -259,4 +278,8 @@ export function setState (s) {
 export function remove () {
   synth.triggerRelease()
   removeP5 = true
+}
+
+export function changePitchClasses (newPitchClasses) {
+  pitchClasses = newPitchClasses
 }

@@ -1,16 +1,19 @@
 <template>
   <v-container class="text-center">
-    <v-row>
-      <v-col :cols="12">
-        <v-switch v-model="mode" label="Play"/>
+    <v-row justify="center" align-content="center">
+      <v-col cols="6">
+        <v-btn color="warning" @click="mode=false">
+          Train
+        </v-btn>
       </v-col>
-      <v-col :cols="12"
-             v-if="mode">
-        <play/>
+      <v-col cols="6">
+        <v-btn color="success" @click="mode=true">
+          Play
+        </v-btn>
       </v-col>
-      <v-col :cols="12"
-             v-else>
-        <train/>
+      <v-col cols="12">
+        <play v-if="mode"/>
+        <train v-else/>
       </v-col>
     </v-row>
   </v-container>
@@ -21,13 +24,13 @@
     name: 'MusicCam',
 
     components: {
-      Play: () => import('sections/music-cam/Play'),
+      Play:  () => import('sections/music-cam/Play'),
       Train: () => import('sections/music-cam/Train'),
     },
 
     data: () => {
       return {
-        mode: false,
+        mode: true,
       }
     },
   }

@@ -179,14 +179,6 @@ export default function (_p5, parent) {
   }
 }
 
-export function setState (s) {
-  if (s) {
-    synth.triggerAttack(currNote)
-  } else {
-    synth.triggerRelease()
-  }
-}
-
 export function remove () {
   removeP5 = true
 }

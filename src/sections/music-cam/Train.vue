@@ -10,8 +10,8 @@
 </template>
 
 <script>
-  import * as p5                     from 'p5'
-  import setup, { remove, setState } from './TrainSetup'
+  import * as p5           from 'p5'
+  import setup, { remove } from './TrainSetup'
 
   export default {
     name: 'Train',
@@ -33,7 +33,6 @@
     methods: {
       toggleGame () {
         this.toggle = !this.toggle
-        setState(this.toggle)
       },
     },
   }
