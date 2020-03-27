@@ -4,8 +4,6 @@ let p5
 let removeP5
 
 let video
-let recording     = false
-let targetLabel   = 'o'
 let isClassifying = false
 let faceapiDetections
 
@@ -82,7 +80,6 @@ export default function (_p5, parent) {
   const faceApiModelReady = () => {
     console.log('face API ready!')
     allModelsReady = true
-    // synth.triggerAttack('C3')
   }
 
   const gotResults = (err, result) => {
@@ -119,7 +116,7 @@ export default function (_p5, parent) {
       p5.vertex(x, y)
     }
     const dist = p5.dist(0, mouthBottom, 0, mouthTop)
-    dbLevel    = p5.map(dist, 10, 40, -80, 0)
+    dbLevel    = p5.map(dist, 5, 20, -80, 0)
     if (dbLevel > 0) {
       dbLevel = 0
     }
@@ -133,18 +130,7 @@ export default function (_p5, parent) {
   }
 
   p5.keyPressed = () => {
-    if (p5.key === 'r') {
-      recording = !recording
-    } else if (p5.key === 'c') {
-      targetLabel = 'm'
-    } else if (p5.key === 's') {
-      NNModel.saveData('data')
-    } else if (p5.key === 'l') {
-      NNModel.save('model')
-      // NNModel.loadData('data.json', dataLoaded)
-      // NNModel.normalizeData()
-      // NNModel.train({epochs: 60}, trainingCallback, finishedTraining)
-    } else if (p5.key === 'p') {
+    if (p5.key === 'p') {
       isClassifying = false
     } else if (p5.key === 'a') {
       synth.setNote('A3')
@@ -156,21 +142,6 @@ export default function (_p5, parent) {
   const NNModelLoaded = () => {
     console.log('NNMODEL READY')
     isClassifying = true
-  }
-
-  // const dataLoaded = () => {
-  //   NNModel.normalizeData()
-  //   NNModel.train({ epochs: 60 }, trainingCallback, finishedTraining)
-  // }
-
-  const trainingCallback = (epoch, loss) => {
-    console.log(epoch, loss)
-  }
-
-  const finishedTraining = () => {
-    console.log('finished training')
-    // NNModel.save()
-    // isClassifying = !isClassifying
   }
 
   const classify = () => {
@@ -186,16 +157,24 @@ export default function (_p5, parent) {
           console.log(error)
           return
         }
-        const dist = parseInt(p5.dist(prevX, prevY, x, y))
-        if (dist > maxDist) {
-          prevX = x
-          prevY = y
-          if (result[0].label === 'o') {
-            synth.setNote('C4')
-          } else {
-            synth.setNote('C3')
-          }
+        // const dist = parseInt(p5.dist(prevX, prevY, x, y))
+        // if (dist > maxDist) {
+          prevX             = x
+          prevY             = y
+        const resultLabel = result[0].label
+        console.log(resultLabel)
+        if (resultLabel === '0') {
+          synth.setNote('C4')
+        } else if (resultLabel === '1') {
+          synth.setNote('D4')
+        } else if (resultLabel === '2') {
+          synth.setNote('E4')
+        } else if (resultLabel === '3') {
+          synth.setNote('G4')
+        } else if (resultLabel === '4') {
+          synth.setNote('A4')
         }
+        // }
       })
     }
   }
@@ -216,7 +195,7 @@ export default function (_p5, parent) {
 
       faceapiAction()
 
-      drawSkeleton()
+      // drawSkeleton()
 
       posenetAction()
     }
@@ -231,26 +210,7 @@ export default function (_p5, parent) {
   }
 
   const posenetAction = () => {
-    if (!isClassifying) {
-      if (poses && poses.length) {
-        for (const pose of poses) {
-          p5.fill(100, 255, 100)
-          p5.ellipse(pose.rightWrist.x, pose.rightWrist.y, 30, 30)
-          if (recording) {
-            const x      = poses[0].rightWrist.x
-            const y      = poses[0].rightWrist.y
-            const inputs = {
-              x,
-              y,
-            }
-            const target = { label: targetLabel }
-            console.log(target)
-            console.log(inputs, target)
-            NNModel.addData(inputs, target)
-          }
-        }
-      }
-    } else {
+    if (isClassifying) {
       classify()
     }
   }

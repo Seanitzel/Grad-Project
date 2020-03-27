@@ -9,6 +9,8 @@
       <v-spacer/>
       <v-btn text to="/">home</v-btn>
       <v-btn text to="/about">about</v-btn>
+      <v-btn text to="#">Audio Extractor</v-btn>
+      <v-btn text to="#">AI Music Buddy</v-btn>
       <v-btn text to="/music-cam">Music Cam</v-btn>
     </v-app-bar>
 
