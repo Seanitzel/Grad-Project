@@ -19,6 +19,11 @@ const routes = [
     path:      '/music-cam',
     name:      'Music Cam',
     component: () => import(/* webpackChunkName: "MusicCam" */ 'views/MusicCam.vue')
+  },
+  {
+    path:      '/audio-extractor',
+    name:      'Audio Extractor',
+    component: () => import(/* webpackChunkName: "MusicCam" */ 'views/AudioExtractor.vue')
   }
 ]
 
