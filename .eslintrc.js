@@ -57,5 +57,6 @@ module.exports = {
     'no-undef': 'off',
     'no-new': 'off',
     'new-cap': 'off',
+    'eol-last': 'off'
   }
 }

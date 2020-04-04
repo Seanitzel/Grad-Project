@@ -22,7 +22,6 @@
 <script>
   export default {
     name: 'MusicCam',
-
     components: {
       Play:  () => import('sections/music-cam/Play'),
       Train: () => import('sections/music-cam/Train'),

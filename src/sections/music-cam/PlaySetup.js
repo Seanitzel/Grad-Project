@@ -277,3 +277,8 @@ export function remove () {
 export function changePitchClasses (newPitchClasses) {
   pitchClasses = newPitchClasses
 }
+
+export function resetNote () {
+  octave   = 4
+  currNote = `${pitchClasses[0]}${4}`
+}
