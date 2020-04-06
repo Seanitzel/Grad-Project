@@ -1,5 +1,6 @@
 <template>
     <v-container class="text-center">
+        <server-err-alert :showAlert="showErr" v-on:alertclose="showErr = false"></server-err-alert>
         <v-row justify="center" align-content="center">
             <v-col cols="12">
                 <v-stepper v-model="currentStep" vertical>
@@ -8,13 +9,13 @@
                     </v-stepper-step>
                     <v-stepper-content step="1">
                         <v-file-input :rules="fileRules" accept="audio/*" show-size label="Audio file"
-                                      @change="selectAudio"></v-file-input>
+                                      @change="selectAudio" :clearable="false"></v-file-input>
                         <v-btn :disabled="!selectedAudio" color="primary" @click="currentStep = 2">Continue</v-btn>
                     </v-stepper-content>
                     <v-stepper-step :complete="currentStep > 2" step="2">Choose stems count</v-stepper-step>
                     <v-stepper-content step="2">
                         <v-row justify="center" align-content="center">
-                            <v-col cols="4" v-for="stemCard of stemCards" :key="stemCard.title">
+                            <v-col cols="md-4 sm-12" v-for="stemCard of stemCards" :key="stemCard.title">
                                 <v-hover>
                                     <template v-slot="{ hover }">
                                         <v-card class="v-card--hover ma-2" :elevation="hover ? 12 : 6"
@@ -64,15 +65,20 @@
                             </v-list-item>
                         </v-card>
                         <v-row justify="center" align-content="center">
-                            <v-btn :disabled="loader" class="mx-2" color="primary" @click="separate">Separate</v-btn>
-                            <v-btn class="mx-2" color="error" @click="backStep">Back</v-btn>
+                            <v-btn :disabled="loader" class="ma-2" color="primary" @click="separate">Separate</v-btn>
+                            <v-btn :disabled="loader" class="ma-2" color="error" @click="backStep">Back</v-btn>
                         </v-row>
-                        <v-row justify="center" align-content="center" v-if="loader">
-                            <v-progress-circular
+                        <v-row justify="center" align-content="center">
+                            <v-progress-circular v-if="loader"
                                     class="my-3"
                                     indeterminate
                                     color="primary">
                             </v-progress-circular>
+                            <a :href="downloadLink" v-if="downloadLink" download="file.zip">
+                                <v-btn class="ma-2" color="success">
+                                    Download zip
+                                </v-btn>
+                            </a>
                         </v-row>
                     </v-stepper-content>
                     </v-stepper-step>
@@ -84,14 +90,18 @@
 
 <script>
     import separtor from '../utilities/separator-client'
+    import ServerErrAlert from '../components/ServerErrAlert'
     export default {
         name: 'AudioExtractor',
+        components: { ServerErrAlert },
         data () {
             return {
                 selectedAudio: undefined,
                 currentStep: 1,
                 selectedStems: undefined,
                 loader: false,
+                showErr: false,
+                downloadLink: undefined,
                 stemCards: [
                     {
                         title: '2 Stems',
@@ -123,22 +133,24 @@
         },
         methods: {
             selectAudio (file) {
-                if ((file.type.split('/'))[0] === 'audio') {
-                    this.selectedAudio = file
-                }
+                this.selectedAudio = file.type.split('/')[0] === 'audio' ?  file : null
             },
             separate () {
                 this.loader = true
                 separtor.upload(this.selectedAudio, this.selectedStems).then(response => {
                     // TODO: refactor the response saving method
                     this.loader = false
-                    const url = window.URL.createObjectURL(new Blob([response.data]))
-                    const link = document.createElement('a')
-                    link.href = url
-                    link.setAttribute('download', 'file.zip') // or any other extension
-                    document.body.appendChild(link)
-                    link.click()
-                }).catch(err => console.log(err.response))
+                    this.downloadLink = window.URL.createObjectURL(new Blob([response.data]))
+                    // const link = document.createElement('a')
+                    // link.href = url
+                    // link.setAttribute('download', 'file.zip') // or any other extension
+                    // document.body.appendChild(link)
+                    // link.click()
+                }).catch(err => {
+                    this.loader = false
+                    this.showErr = true
+                    console.log(err.response)
+                })
             },
             backStep () {
                 this.currentStep--
