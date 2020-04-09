@@ -40,7 +40,7 @@
                             <v-btn class="mx-2" color="error" @click="backStep">Back</v-btn>
                         </v-row>
                     </v-stepper-content>
-                    <v-stepper-step :complete="currentStep > 3" step="3">
+                    <v-stepper-step :complete="currentStep > 3" step="3">Confirm</v-stepper-step>
                     <v-stepper-content step="3">
                         <v-card outlined class="mb-5" v-if="currentStep === 3">
                             <v-list-item two-line>
@@ -74,14 +74,28 @@
                                     indeterminate
                                     color="primary">
                             </v-progress-circular>
-                            <a :href="downloadLink" v-if="downloadLink" download="file.zip">
-                                <v-btn class="ma-2" color="success">
-                                    Download zip
-                                </v-btn>
-                            </a>
                         </v-row>
                     </v-stepper-content>
-                    </v-stepper-step>
+                    <v-stepper-step :complete="currentStep > 4" step="4">Play and Download</v-stepper-step>
+                    <v-stepper-content step="4">
+                            <v-row justify="center" align-content="center">
+                                <v-col cols="12">
+                                    <audio-playlist :playlist="stemsAudioFiles" :header="'Stems Playlist'"></audio-playlist>
+                                </v-col>
+                            </v-row>
+                            <a :href="downloadLink" v-if="downloadLink" download="file.zip">
+                                <v-btn class="ma-2" color="success">
+                                    Download all stems as zip
+                                </v-btn>
+                            </a>
+                            <v-row justify="center" align-content="center">
+                                <v-col cols="12">
+                                    <v-btn class="ma-2" color="primary" @click="resetSteps">
+                                        Separate Again
+                                    </v-btn>
+                                </v-col>
+                            </v-row>
+                        </v-stepper-content>
                 </v-stepper>
             </v-col>
         </v-row>
@@ -91,9 +105,12 @@
 <script>
     import separtor from '../utilities/separator-client'
     import ServerErrAlert from '../components/ServerErrAlert'
+    import { unzip } from '../utilities/zip-client'
+    import AudioPlaylist from '../components/AudioPlaylist'
+    console.log(unzip)
     export default {
         name: 'AudioExtractor',
-        components: { ServerErrAlert },
+        components: { AudioPlaylist, ServerErrAlert },
         data () {
             return {
                 selectedAudio: undefined,
@@ -121,6 +138,16 @@
                         stems: 'Vocals, Drums, Bass, Piano and other',
                         img: require('../assets/stem cards/5stems.png')
                     }
+                ],
+                stemsAudioFiles: [
+                    {
+                        name: 'asd12',
+                        filePath: 'blob:http://localhost:8080/3b898ae4-5678-4aaa-9289-d28f0ca2bedc'
+                    },
+                    {
+                        name: 'asd12',
+                        filePath: 'blob:http://localhost:8080/3b898ae4-5678-4aaa-9289-d28f0ca2bedc'
+                    },
                 ]
             }
         },
@@ -141,11 +168,10 @@
                     // TODO: refactor the response saving method
                     this.loader = false
                     this.downloadLink = window.URL.createObjectURL(new Blob([response.data]))
-                    // const link = document.createElement('a')
-                    // link.href = url
-                    // link.setAttribute('download', 'file.zip') // or any other extension
-                    // document.body.appendChild(link)
-                    // link.click()
+                    unzip(response.data).then(files => {
+                        this.stemsAudioFiles = files
+                        this.currentStep++
+                    })
                 }).catch(err => {
                     this.loader = false
                     this.showErr = true
@@ -157,6 +183,12 @@
             },
             setStemsCount (stems) {
                 this.selectedStems = this.selectedStems === stems ? undefined : stems
+            },
+            resetSteps () {
+                this.selectedAudio = null
+                this.currentStep = 1
+                this.selectedStems = undefined
+                this.downloadLink = null
             }
         }
     }
