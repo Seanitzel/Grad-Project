@@ -6,6 +6,7 @@ export function unzip (file: string, callback: object) {
        file: File;
        filePath: string;
     }[] = []
+
     return new Promise((resolve, reject) => {
         // TODO: refactor this method
         jsZip.loadAsync(file).then(function (zip: any) {

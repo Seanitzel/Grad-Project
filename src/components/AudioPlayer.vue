@@ -1,9 +1,7 @@
 <template>
-    <v-container>
-        <v-col cols="12">
-            <vuetify-audio class="md-mx-5" :file="file" color="blue-grey darken-1"></vuetify-audio>
-        </v-col>
-    </v-container>
+    <v-col cols="12" class="ma-0 pa-0">
+        <vuetify-audio class="md-mx-5" :autoPlay="autoPlay" :file="file" color="blue-grey darken-1"></vuetify-audio>
+    </v-col>
 </template>
 
 <script>
@@ -14,10 +12,13 @@
         },
         props: {
             file: String,
+            autoPlay: Boolean
         }
     }
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
+    .v-card {
+        box-shadow: none;
+    }
 </style>

@@ -2,6 +2,7 @@
     <v-container class="text-center">
         <server-err-alert :showAlert="showErr" v-on:alertclose="showErr = false"></server-err-alert>
         <v-row justify="center" align-content="center">
+<!--            <audio-playlist :save-to="'stems'" :playlist="stemsAudioFiles" :header="'Stems Playlist'"></audio-playlist>-->
             <v-col cols="12">
                 <v-stepper v-model="currentStep" vertical>
                     <v-stepper-step :complete="currentStep > 1" step="1">
@@ -9,7 +10,7 @@
                     </v-stepper-step>
                     <v-stepper-content step="1">
                         <v-file-input :rules="fileRules" accept="audio/*" show-size label="Audio file"
-                                      @change="selectAudio" :clearable="false"></v-file-input>
+                                      @change="selectAudio" :clearable="false" :value="selectedAudio"></v-file-input>
                         <v-btn :disabled="!selectedAudio" color="primary" @click="currentStep = 2">Continue</v-btn>
                     </v-stepper-content>
                     <v-stepper-step :complete="currentStep > 2" step="2">Choose stems count</v-stepper-step>
@@ -68,19 +69,24 @@
                             <v-btn :disabled="loader" class="ma-2" color="primary" @click="separate">Separate</v-btn>
                             <v-btn :disabled="loader" class="ma-2" color="error" @click="backStep">Back</v-btn>
                         </v-row>
-                        <v-row justify="center" align-content="center">
-                            <v-progress-circular v-if="loader"
-                                    class="my-3"
+                        <v-row justify="center" align-content="center" class="my-5" v-if="loader">
+                            <v-col
+                                    class="title text-center"
+                                    cols="12">
+                                Getting your stems
+                            </v-col>
+                            <v-progress-linear class="my-3 mx-5"
+                                    color="deep-purple accent-4"
                                     indeterminate
-                                    color="primary">
-                            </v-progress-circular>
+                                    rounded
+                                    height="6"></v-progress-linear>
                         </v-row>
                     </v-stepper-content>
                     <v-stepper-step :complete="currentStep > 4" step="4">Play and Download</v-stepper-step>
                     <v-stepper-content step="4">
                             <v-row justify="center" align-content="center">
                                 <v-col cols="12">
-                                    <audio-playlist :playlist="stemsAudioFiles" :header="'Stems Playlist'"></audio-playlist>
+                                    <audio-playlist :save-to="'stems'" :playlist="stemsAudioFiles" :header="'Stems Playlist'"></audio-playlist>
                                 </v-col>
                             </v-row>
                             <a :href="downloadLink" v-if="downloadLink" download="file.zip">
@@ -107,7 +113,6 @@
     import ServerErrAlert from '../components/ServerErrAlert'
     import { unzip } from '../utilities/zip-client'
     import AudioPlaylist from '../components/AudioPlaylist'
-    console.log(unzip)
     export default {
         name: 'AudioExtractor',
         components: { AudioPlaylist, ServerErrAlert },
@@ -140,13 +145,14 @@
                     }
                 ],
                 stemsAudioFiles: [
+                    // TODO: delete those mocks
                     {
-                        name: 'asd12',
-                        filePath: 'blob:http://localhost:8080/3b898ae4-5678-4aaa-9289-d28f0ca2bedc'
+                        name: 'drums',
+                        filePath: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3'
                     },
                     {
-                        name: 'asd12',
-                        filePath: 'blob:http://localhost:8080/3b898ae4-5678-4aaa-9289-d28f0ca2bedc'
+                        name: 'vocal',
+                        filePath: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3'
                     },
                 ]
             }
@@ -160,7 +166,7 @@
         },
         methods: {
             selectAudio (file) {
-                this.selectedAudio = file.type.split('/')[0] === 'audio' ?  file : null
+                this.selectedAudio = file && file.type.split('/')[0] === 'audio' ?  file : null
             },
             separate () {
                 this.loader = true
@@ -185,7 +191,7 @@
                 this.selectedStems = this.selectedStems === stems ? undefined : stems
             },
             resetSteps () {
-                this.selectedAudio = null
+                this.selectAudio(null)
                 this.currentStep = 1
                 this.selectedStems = undefined
                 this.downloadLink = null

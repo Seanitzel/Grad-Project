@@ -11,22 +11,21 @@
                             <v-list-item :ripple="false"
                                     v-for="(stem, i) in playlist"
                                     :key="i">
-                                <v-list-item-content>
-                                    <v-btn depressed :color=" currentAudio === i ? 'blue lighten-3': 'blue lighten-5'">
-                                        <v-list-item-title
-                                                @click="currentAudio = currentAudio === i ? undefined: i"
-                                                class="text-left ml-5 title font-weight-light">
-                                            {{ stem.name.split('.')[0].toUpperCase() }}
-                                        </v-list-item-title>
-                                    </v-btn>
+                                <v-list-item-content class="ma-0 pa-0">
+                                    <v-row justify="center" align-content="center">
+                                        <v-col cols="md-4 sm-12" class="align-self-center text-left">
+                                            <v-list-item-title
+                                                    @click="currentAudio = currentAudio === i ? undefined: i"
+                                                    class="text-left ml-5 title font-weight-light">
+                                                {{ stem.name.split('.')[0].toUpperCase() }}
+                                            </v-list-item-title>
+                                            <v-btn v-if="saveTo !== undefined" @click="saveAudio(stem, saveTo)" class="ml-4 mt-2">save</v-btn>
+                                        </v-col>
+                                        <v-col cols="md-8 sm-12" class="ma-0 pa-0">
+                                            <audio-player :file="stem.filePath"></audio-player>
+                                        </v-col>
+                                    </v-row>
                                     <v-divider></v-divider>
-                                    <v-scroll-y-reverse-transition>
-                                        <v-row justify="center" align-content="center" v-if="currentAudio === i"  v-show="currentAudio === i">
-                                            <v-col cols="12">
-                                                <audio-player :file="stem.filePath"></audio-player>
-                                            </v-col>
-                                        </v-row>
-                                    </v-scroll-y-reverse-transition>
                                 </v-list-item-content>
                             </v-list-item>
                         </v-list-item-group>
@@ -39,6 +38,7 @@
 
 <script>
     import AudioPlayer from '../components/AudioPlayer'
+    import { storeSaveAudio } from '../utilities/audio-store'
     export default {
         name: 'AudioPlaylist',
         components: { AudioPlayer },
@@ -49,8 +49,14 @@
         },
         props: {
             playlist: Array,
-            header: String
+            header: String,
+            saveTo: String,
         },
+        methods: {
+            saveAudio: (audio, category) => {
+                storeSaveAudio(audio, category)
+            }
+        }
     }
 </script>
 
