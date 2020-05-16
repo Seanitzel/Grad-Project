@@ -12,7 +12,6 @@ export const initAudioStore = function () {
 
 export const storeSaveAudio = (audio: File, category: String) => {
     // @ts-ignore
-    console.log(audio)
     window.audioStore[category].audioList.push(audio)
 }
 
