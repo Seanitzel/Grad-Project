@@ -1,13 +1,15 @@
 <template>
     <v-navigation-drawer
-            v-model="drawState"
+            fixed
             :bottom="true"
             :mini-variant.sync="mini"
             expand-on-hover
-            app
-            width="300px"
-            permanent>
-        <v-list-item class="px-2">
+            floating
+            permanent
+            :color="mini? 'transparent': 'white'"
+            class="pt-12"
+            width="300px">
+        <v-list-item class="px-2 logo">
             <v-list-item-avatar>
                 <v-img :src="saveIcon"></v-img>
             </v-list-item-avatar>
@@ -22,7 +24,7 @@
 
         <v-divider></v-divider>
 
-        <v-list dense>
+        <v-list v-if="!mini" dense>
             <v-list-item
                     v-for="category in categories"
                     :key="category.title"
@@ -41,7 +43,7 @@
                                             v-for="(audioFile, i) in category.audioList"
                                             :key="i">
                                         <v-list-item-content>
-                                            <div @click="setCurrentAudio(audioFile)" v-text="audioFile.name"></div>
+                                            <div @click="setCurrentAudio(audioFile.file)" v-text="`${audioFile.name} ${audioFile.file.name}`"></div>
                                         </v-list-item-content>
                                     </v-list-item>
                                 </v-list-item-group>
@@ -52,7 +54,7 @@
                 </v-list-item-content>
             </v-list-item>
         </v-list>
-        <div class="player-wrapper" v-if="currentAudio" :style="{visibility: mini ? 'hidden': 'visible'}">
+        <div class="player-wrapper" v-if="currentAudio" :style="mini ? { position: 'fixed' }: { position: 'absolute' }">
             <v-list-item-title>{{ currentAudio.name }}</v-list-item-title>
             <audio-player :auto-play="true" :file="currentAudio.filePath"></audio-player>
         </div>
@@ -83,12 +85,20 @@
 </script>
 
 <style lang="scss" scoped>
+    .v-navigation-drawer--fixed {
+        overflow: visible !important;
+    }
     .player-wrapper {
-        position: absolute;
+        /*position: absolute;*/
         bottom: 0;
         left: 0;
         right: 0;
         margin: auto;
         text-align: center;
+        width: fit-content;
+    }
+    .logo {
+        background: rgba(255,255,255,0.6);
+        border-radius: 5px;
     }
 </style>
