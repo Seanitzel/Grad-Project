@@ -10,9 +10,13 @@ export const initAudioStore = function () {
     }
 }
 
-export const storeSaveAudio = (audio: File, category: String) => {
+export const storeSaveAudio = (audio: File, category: String, originalName: String) => {
     // @ts-ignore
-    window.audioStore[category].audioList.push(audio)
+    console.log(originalName)
+    window.audioStore[category].audioList.push({
+        file: audio,
+        name: originalName
+    })
 }
 
 export const storeGetData = () => {

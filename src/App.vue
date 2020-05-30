@@ -1,5 +1,6 @@
 <template>
   <v-app>
+    <snack-bar></snack-bar>
     <v-app-bar
         app
         color="primary" dark>
@@ -24,14 +25,12 @@
   import Vue from 'vue'
   import { initAudioStore } from './utilities/audio-store'
   import AudioStore from './components/AudioStore'
+  import SnackBar from './components/SnackBar'
   export default Vue.extend({
     name: 'App',
     created: function () {
       initAudioStore()
     },
-    components: { AudioStore },
-    data: () => ({
-      //
-    }),
+    components: { AudioStore, SnackBar },
   })
 </script>

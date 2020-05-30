@@ -2,7 +2,6 @@
     <v-container class="text-center">
         <server-err-alert :showAlert="showErr" v-on:alertclose="showErr = false"></server-err-alert>
         <v-row justify="center" align-content="center">
-<!--            <audio-playlist :save-to="'stems'" :playlist="stemsAudioFiles" :header="'Stems Playlist'"></audio-playlist>-->
             <v-col cols="12">
                 <v-stepper v-model="currentStep" vertical>
                     <v-stepper-step :complete="currentStep > 1" step="1">
@@ -86,7 +85,10 @@
                     <v-stepper-content step="4">
                             <v-row justify="center" align-content="center">
                                 <v-col cols="12">
-                                    <audio-playlist :save-to="'stems'" :playlist="stemsAudioFiles" :header="'Stems Playlist'"></audio-playlist>
+<!--                                    <audio-playlist :save-to="'stems'" :playlist="stemsAudioFiles" :header="'Stems Playlist'"></audio-playlist>-->
+                                    <audio-playlist :category="'stems'" :original-name="stemsAudioFiles.name"
+                                                    :playlist="stemsAudioFiles" :header="'Stems Playlist'">
+                                    </audio-playlist>
                                 </v-col>
                             </v-row>
                             <a :href="downloadLink" v-if="downloadLink" download="file.zip">
@@ -152,7 +154,7 @@
                     },
                     {
                         name: 'vocal',
-                        filePath: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3'
+                        filePath: 'https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_1MG.mp3'
                     },
                 ]
             }
@@ -167,6 +169,7 @@
         methods: {
             selectAudio (file) {
                 this.selectedAudio = file && file.type.split('/')[0] === 'audio' ?  file : null
+                console.log(this.selectedAudio)
             },
             separate () {
                 this.loader = true
