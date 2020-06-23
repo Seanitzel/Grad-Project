@@ -13,6 +13,8 @@ let allModelsReady = false
 
 let poses, skeletons
 
+let color = null
+
 let dbLevel                 = -80
 let currNote                = 'C4'
 let pitchClasses            = ['C', 'D', 'E', 'G', 'A']
@@ -21,6 +23,17 @@ let isOctaveUpdateAvailable = true
 
 let mouthTop    = -Infinity
 let mouthBottom = Infinity
+
+const SKELETONS_TO_DRAW  = ['rightWrist', 'leftWrist', 'rightShoulder', 'leftShoulder', 'rightElbow', 'leftElbow']
+const BODY_PARTS_TO_DRAW = ['rightWrist',
+  'leftWrist',
+  'rightShoulder',
+  'leftShoulder',
+  'rightElbow',
+  'leftElbow',
+  'leftEye',
+  'rightEye',
+]
 
 const synthConfig = {
   oscillator: {
@@ -44,6 +57,7 @@ export default function (_p5, parent) {
 
   p5.setup = async () => {
     const canvas = p5.createCanvas(640, 480)
+    updateColors()
     canvas.parent(parent)
     video                  = p5.createCapture(p5.VIDEO)
     const detectionOptions = {
@@ -57,7 +71,7 @@ export default function (_p5, parent) {
     })
     posenetModel.on('pose', data => {
       if (data.length) {
-        const results = data.filter(res => res.pose.score > 0.3)
+        const results = data.filter(res => res.pose.score > 0.6)
         poses         = []
         skeletons     = []
         results.forEach(res => {
@@ -92,8 +106,8 @@ export default function (_p5, parent) {
 
   const drawLandmarks = (detections) => {
     p5.noFill()
-    p5.stroke(161, 95, 251)
-    p5.strokeWeight(2)
+    p5.stroke(color)
+    p5.strokeWeight(3)
 
     for (let i = 0; i < detections.length; i++) {
       const mouth = detections[i].parts.mouth
@@ -168,6 +182,7 @@ export default function (_p5, parent) {
       if (note !== currNote) {
         currNote = note
         synth.setNote(note)
+        updateColors()
       }
     })
   }
@@ -183,10 +198,14 @@ export default function (_p5, parent) {
       const leftShoulderDist  = parseInt(p5.dist(leftHandX, leftHandY, leftShoulderX, leftShoulderY))
       const rightShoulderDist = parseInt(p5.dist(leftHandX, leftHandY, rightHipX, rightHipY))
       if (leftShoulderDist < 60) {
-        --octave
+        if (octave > 2) {
+          --octave
+        }
         onOctaveUpdate()
       } else if (rightShoulderDist < 60) {
-        ++octave
+        if (octave < 7) {
+          ++octave
+        }
         onOctaveUpdate()
       }
     }
@@ -197,6 +216,15 @@ export default function (_p5, parent) {
     setTimeout(() => {
       isOctaveUpdateAvailable = true
     }, 400)
+  }
+
+  const updateColors = () => {
+    color = p5.color(
+      p5.random(255),
+      p5.random(100, 200),
+      p5.random(100),
+      p5.random(200, 255),
+    )
   }
 
   p5.draw = () => {
@@ -211,6 +239,15 @@ export default function (_p5, parent) {
       drawSkeleton()
 
       posenetAction()
+
+      p5.translate(p5.width / 2, p5.height / 2)
+      p5.scale(1, -1)
+      p5.rotate(p5.PI)
+      p5.textSize(64)
+      p5.strokeWeight(34)
+      p5.stroke(0, 0, 0)
+      p5.fill(color)
+      p5.text(currNote, -300, -170)
     }
   }
 
@@ -243,17 +280,28 @@ export default function (_p5, parent) {
           for (let i = 0; i < skeleton.length; i++) {
             const a = skeleton[i][0]
             const b = skeleton[i][1]
-            p5.strokeWeight(2)
-            p5.stroke(0)
-
-            p5.line(a.position.x, a.position.y, b.position.x, b.position.y)
+            if (SKELETONS_TO_DRAW.includes(a.part) && SKELETONS_TO_DRAW.includes(b.part)) {
+              p5.strokeWeight(6)
+              p5.stroke(color)
+              p5.line(a.position.x, a.position.y, b.position.x, b.position.y)
+            }
           }
           for (let i = 0; i < pose.keypoints.length; i++) {
-            const x = pose.keypoints[i].position.x
-            const y = pose.keypoints[i].position.y
-            p5.fill(0)
-            p5.stroke(255)
-            p5.ellipse(x, y, 16, 16)
+            const { part, position } = pose.keypoints[i]
+            if (BODY_PARTS_TO_DRAW.includes(part)) {
+              const { x, y } = position
+              if (['rightEye', 'leftEye'].includes(part)) {
+                p5.fill(255)
+                p5.strokeWeight(20)
+                p5.stroke(color)
+                p5.ellipse(x, y, 5, 5)
+              } else {
+                p5.strokeWeight(0.1)
+                p5.fill(color)
+                p5.stroke(255)
+                p5.ellipse(x, y, 25, 25)
+              }
+            }
           }
         }
       }
@@ -276,6 +324,10 @@ export function remove () {
 
 export function changePitchClasses (newPitchClasses) {
   pitchClasses = newPitchClasses
+}
+
+export function updateReadyState () {
+
 }
 
 export function resetNote () {
