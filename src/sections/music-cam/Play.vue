@@ -71,7 +71,7 @@
     mounted () {
       setTimeout(() => {
         this.allModelsReady = true
-      }, 5000)
+      }, 10000)
       new p5(setup, this.$refs.canvas)
     },
 
