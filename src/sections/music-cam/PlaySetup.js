@@ -254,7 +254,7 @@ export default function (_p5, parent) {
       p5.strokeWeight(34)
       p5.stroke(0, 0, 0)
       p5.fill(color)
-      p5.text(currNote, -300, -170)
+      p5.text(currNote, -300, -160)
     }
   }
 
@@ -299,7 +299,7 @@ export default function (_p5, parent) {
               const { x, y } = position
               if (['rightEye', 'leftEye'].includes(part)) {
                 p5.fill(255)
-                p5.strokeWeight(20)
+                p5.strokeWeight(10)
                 p5.stroke(color)
                 p5.ellipse(x, y, 5, 5)
               } else {
