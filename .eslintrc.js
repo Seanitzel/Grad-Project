@@ -59,5 +59,6 @@ module.exports = {
     'new-cap': 'off',
     'eol-last': 'off',
     'space-before-function-paren': "off",
+    'object-curly-spacing': 'off'
   }
 }

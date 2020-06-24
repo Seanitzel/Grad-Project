@@ -12,37 +12,17 @@
       </v-list-item>
 
       <v-divider></v-divider>
-
-      <v-list dense>
-        <v-list-item
-          v-for="category in categories"
-          :key="category.title"
-          link>
-          <v-list-item-icon>
-            <img :src="category.icon"/>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-expansion-panels>
-              <v-expansion-panel>
-                <v-expansion-panel-header>{{ category.title }}</v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  <v-list>
-                    <v-list-item-group color="primary">
-                      <v-list-item
-                        v-for="(audioFile, i) in category.audioList"
-                        :key="i">
-                        <v-list-item-content>
-                          <div @click="setCurrentAudio(audioFile.file)"
-                               v-text="`${audioFile.name} ${audioFile.file.name}`"></div>
-                        </v-list-item-content>
-                      </v-list-item>
-                    </v-list-item-group>
-                  </v-list>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-            </v-expansion-panels>
-          </v-list-item-content>
-        </v-list-item>
+      <v-list>
+        <v-list-item-group color="primary">
+          <v-list-item
+            v-for="([name, audio], i) in Object.entries($store.getters['getAudioList'])"
+            :key="i">
+            <v-list-item-content>
+              <div @click="setCurrentAudio(audio)"
+                   v-text="`${name} ${audio.name}`"></div>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list-item-group>
       </v-list>
       <div class="player-wrapper" v-if="currentAudio">
         <v-list-item-title>{{ currentAudio.name }}</v-list-item-title>
@@ -75,28 +55,23 @@
 </template>
 
 <script lang="ts">
-    import Vue              from 'vue'
-    import { initAudioStore, storeGetData } from './utilities/audio-store'
-    import SnackBar         from './components/SnackBar'
+    import Vue      from 'vue'
+    import SnackBar from './components/SnackBar'
 
-    import AudioPlayer      from './components/AudioPlayer'
+    import AudioPlayer from './components/AudioPlayer'
 
     export default Vue.extend({
         name:       'App',
-        created:    function () {
-            initAudioStore()
-        },
         components: { AudioPlayer, SnackBar },
-        data () {
+        data() {
             return {
                 drawer:       false,
                 saveIcon:     require('./assets/audio store/logo.svg'),
-                categories:   storeGetData(),
                 currentAudio: null,
             }
         },
         methods:    {
-            setCurrentAudio (audio) {
+            setCurrentAudio(audio) {
                 this.currentAudio = audio
             },
         },
