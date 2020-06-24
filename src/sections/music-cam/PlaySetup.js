@@ -1,7 +1,13 @@
-import { Synth } from 'tone'
+import { Synth, AMSynth, FMSynth, MonoSynth, NoiseSynth } from 'tone'
+
+const INSTRUMENTS = {
+  Synth, AMSynth, FMSynth, MonoSynth, NoiseSynth,
+}
 
 let p5
 let removeP5
+
+let playState = false
 
 let video
 let isClassifying = false
@@ -50,7 +56,8 @@ const synthConfig = {
   },
 }
 
-const synth = new Synth(synthConfig).toDestination()
+let instrument     = new Synth(synthConfig).toDestination()
+let instrumentName = 'Synth'
 
 export default function (_p5, parent) {
   p5 = _p5
@@ -134,7 +141,7 @@ export default function (_p5, parent) {
     if (dbLevel > 0) {
       dbLevel = 0
     }
-    synth.volume.rampTo(dbLevel)
+    instrument.volume.rampTo(dbLevel)
 
     if (closed === true) {
       p5.endShape(p5.CLOSE)
@@ -147,9 +154,9 @@ export default function (_p5, parent) {
     if (p5.key === 'p') {
       isClassifying = false
     } else if (p5.key === 'a') {
-      synth.setNote('A3')
+      instrument.setNote('A3')
     } else if (p5.key === 'b') {
-      synth.setNote('C3')
+      instrument.setNote('C3')
     }
   }
 
@@ -181,7 +188,7 @@ export default function (_p5, parent) {
       const note        = `${pc}${octave}`
       if (note !== currNote) {
         currNote = note
-        synth.setNote(note)
+        instrument.setNote(note)
         updateColors()
       }
     })
@@ -309,28 +316,50 @@ export default function (_p5, parent) {
   }
 }
 
-export function setState (s) {
+export function setState(s) {
   if (s) {
-    synth.triggerAttack(currNote)
+    instrument.triggerAttack(currNote)
   } else {
-    synth.triggerRelease()
+    instrument.triggerRelease()
   }
+  playState = s
 }
 
-export function remove () {
-  synth.triggerRelease()
+export function remove() {
+  instrument.triggerRelease()
   removeP5 = true
 }
 
-export function changePitchClasses (newPitchClasses) {
+export function changePitchClasses(newPitchClasses) {
   pitchClasses = newPitchClasses
+  setState(false)
+  currNote = `${newPitchClasses[0]}${currNote[currNote.length - 1]}`
+  setTimeout(() => {
+    setState(true)
+  }, 250)
 }
 
-export function updateReadyState () {
-
+export async function updateInstrument(newInstrument, preset) {
+  instrumentName = newInstrument
 }
 
-export function resetNote () {
+export async function updatePreset(preset) {
+  if (playState) {
+    setState(false)
+    setTimeout(() => {
+      setState(true)
+    }, 250)
+  }
+  instrument.dispose()
+  const response = await fetch(`/tone-presets/${preset}`)
+  if (!response.ok) {
+    return
+  }
+  const config = await response.json()
+  instrument   = new INSTRUMENTS[instrumentName](config).toDestination()
+}
+
+export function resetNote() {
   octave   = 4
   currNote = `${pitchClasses[0]}${4}`
 }
