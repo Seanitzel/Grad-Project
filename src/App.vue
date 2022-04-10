@@ -56,9 +56,9 @@
 
 <script lang="ts">
     import Vue      from 'vue'
-    import SnackBar from './components/SnackBar'
+    import SnackBar from './components/SnackBar.vue'
 
-    import AudioPlayer from './components/AudioPlayer'
+    import AudioPlayer from './components/AudioPlayer.vue'
 
     export default Vue.extend({
         name:       'App',

@@ -2,7 +2,8 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
-    "strict": true,
+    "allowJs": true,
+    "strict": false,
     "jsx": "preserve",
     "skipLibCheck": true,
     "importHelpers": true,
@@ -34,7 +35,7 @@
     "src/**/*.vue",
     "tests/**/*.ts",
     "tests/**/*.tsx"
-  ],
+, "src/store/index.js"  ],
   "exclude": [
     "node_modules"
   ]

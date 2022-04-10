@@ -9,7 +9,7 @@ export default new Vuex.Store({
         audioList: {}
     },
     getters:   {
-        getAudioList: (state : { audioList : Array<any> }) => state.audioList
+        getAudioList: (state) => state.audioList
     },
     mutations: {
         ADD_TO_AUDIO_LIST(state, {name, audio}) {
