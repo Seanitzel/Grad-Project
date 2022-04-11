@@ -54,7 +54,7 @@
   </v-app>
 </template>
 
-<script lang="ts">
+<script>
     import Vue      from 'vue'
     import SnackBar from './components/SnackBar.vue'
 
