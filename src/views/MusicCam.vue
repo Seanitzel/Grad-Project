@@ -2,7 +2,11 @@
   <v-container class="text-center">
     <v-row justify="center" align-content="center">
       <v-col cols="12">
-        <play/>
+        <v-btn @click="mode=!mode">Toggle mode: {{mode ? 'Play' : 'Train'}}</v-btn>
+      </v-col>
+      <v-col cols="12">
+        <play v-if="mode"/>
+        <train v-else/>
       </v-col>
     </v-row>
   </v-container>
@@ -13,6 +17,7 @@
     name: 'MusicCam',
     components: {
       Play:  () => import('sections/music-cam/Play'),
+      Train:  () => import('sections/music-cam/Train'),
     },
 
     data: () => {
